@@ -1,7 +1,7 @@
 # Curva de Phillips en Chile, 2010–2024
 
-Código y datos de la memoria de título *Validez Empírica de la Curva de Phillips en Chile: Contraste y
-Determinantes del Desempleo según Sexo y Composición Educacional* (Ingeniería Civil Industrial,
+Código y datos de la memoria de título *Contraste Empírico de la Curva de Phillips y Determinantes del
+Desempleo por Sexo en Chile entre 2010 y 2024* (Ingeniería Civil Industrial,
 Universidad Técnica Federico Santa María, 2026). Autor: Lautaro Alen Morales Vásquez.
 
 El análisis se hace íntegramente en Python. El script `ejecutar_todo.py` va desde los datos originales
