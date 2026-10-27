@@ -17,6 +17,8 @@ pip install -r requirements.txt
 
 (En Windows, si `pip` no se reconoce, usar `py -m pip install -r requirements.txt`.)
 
+El código fue probado con Python 3.13, pandas 3.0, NumPy 2.5, SciPy 1.18, Matplotlib 3.11 y openpyxl 3.1.
+
 ## 2. Datos
 
 Las cuatro series del Banco Central de Chile (Base de Datos Estadísticos) ya vienen en `datos/`.
