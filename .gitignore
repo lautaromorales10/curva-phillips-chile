@@ -1,0 +1,7 @@
+# Resultados generados por los scripts
+resultados/
+# Microdatos de la ESI (se descargan desde el INE)
+datos/esi/*.dta
+# Python
+__pycache__/
+*.pyc
