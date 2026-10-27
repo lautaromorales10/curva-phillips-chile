@@ -69,3 +69,16 @@ la carpeta `resultados/`.
 `config.py` define las rutas, el número de réplicas del bootstrap (9.999) y la semilla (2026), que hace
 que los valores p sean siempre los mismos. `econometria.py` contiene las funciones de estimación
 (MCO con errores agrupados, bootstrap salvaje restringido, ADF con valores críticos de MacKinnon (2010) y KPSS).
+
+## 5. Validación
+
+La carpeta `validacion/` contiene dos programas que se ejecutan después de `ejecutar_todo.py`:
+
+- `python validacion/validar_econometria.py` contrasta cada función de `econometria.py` (MCO, errores
+  agrupados, Wald, Durbin-Watson, bootstrap salvaje, ADF, KPSS y filtro HP) con una implementación
+  independiente, y termina con el número de comprobaciones correctas (11 de 11).
+- `python validacion/montecarlo_tamano.py` simula datos en que la inflación no afecta al desempleo, con el
+  mismo diseño del modelo de la columna 3, y reporta con qué frecuencia cada prueba rechaza la hipótesis
+  nula al 5%. Los errores agrupados convencionales la rechazan en torno al 12% de los casos (cerca del 20%
+  si las perturbaciones son más volátiles en los años de inflación extrema), mientras que el bootstrap
+  salvaje se mantiene en torno al 4% (menos del 3% en el segundo caso).
