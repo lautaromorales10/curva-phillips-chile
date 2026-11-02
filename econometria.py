@@ -86,16 +86,16 @@ def wild_F(X, Y, g, R, rng, B):
 
 # --------------------------------------------------------------------------- Driscoll-Kraay
 def driscoll_kraay(y, X, t, L):
-    """MCO con errores de Driscoll y Kraay (1998): los momentos se suman por periodo t (ordenable
-    cronológicamente) y se aplica una ventana de Bartlett con L rezagos. Robustos a la correlación
-    entre las unidades de un mismo periodo y a la autocorrelación hasta L periodos."""
+    """MCO con errores de Driscoll y Kraay (1998): los momentos se suman por periodo t (índice entero,
+    en que periodos consecutivos difieren en 1) y se ponderan con una ventana de Bartlett según su
+    distancia en el tiempo, hasta L periodos. Robustos a la correlación entre las unidades de un mismo
+    periodo y a la autocorrelación; admiten periodos excluidos de la muestra."""
     y, X, t = np.asarray(y, float), np.asarray(X, float), np.asarray(t)
     XtXi = np.linalg.inv(X.T @ X); b = XtXi @ X.T @ y; e = y - X @ b
-    h = np.array([X[t == s].T @ e[t == s] for s in np.unique(t)])
-    S = h.T @ h
-    for l in range(1, L + 1):
-        G = h[l:].T @ h[:-l]
-        S += (1 - l / (L + 1)) * (G + G.T)
+    T = np.unique(t)
+    h = np.array([X[t == s].T @ e[t == s] for s in T])
+    dist = np.abs(T[:, None] - T[None, :])
+    S = h.T @ np.where(dist <= L, 1 - dist / (L + 1), 0.0) @ h
     V = XtXi @ S @ XtXi; se = np.sqrt(np.diag(V)); df = len(h) - 1
     return dict(b=b, se=se, V=V, df=df, p=2 * stats.t.sf(np.abs(b / se), df))
 

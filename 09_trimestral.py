@@ -46,7 +46,7 @@ for archivo, sexo in (("desocupacion_hombres.xlsx", 0), ("desocupacion_mujeres.x
 b = pd.concat(partes)
 b = b[(b.index >= pd.Period("2010Q1")) & (b.index <= pd.Period("2024Q4"))].copy()
 b["anio"], b["trimestre"] = b.index.year, b.index.quarter
-b["periodo"] = b.anio * 10 + b.trimestre                       # orden cronológico para Driscoll-Kraay
+b["periodo"] = b.anio * 4 + b.trimestre                        # índice trimestral consecutivo (Driscoll-Kraay)
 assert len(b) == 120, "La base trimestral debe tener 60 trimestres por sexo"
 b.reset_index(drop=True)[["anio", "trimestre", "sexo", "desempleo", "inflacion", "d_desempleo", "d_inflacion"]] \
     .round(4).to_csv(RES / "base_trimestral_2010_2024.csv", index=False)
@@ -145,7 +145,7 @@ Variable dependiente & $\Delta_4 U$ & $\Delta_4 U$ & $\Delta_4 U$ \\
 \begin{minipage}{0.97\linewidth}
 \scriptsize \textit{Nota.} Mínimos cuadrados ordinarios sobre la base apilada por sexo con datos trimestrales
 (trimestres calendario). $\Delta_4$ denota la variación respecto del mismo trimestre del año anterior; la inflación
-corresponde a la variación interanual del IPC promedio de cada trimestre. Entre paréntesis, errores estándar agrupados
+corresponde a la variación interanual del IPC promedio de cada trimestre y entra en la regresión como $\Delta_4 \pi$. Entre paréntesis, errores estándar agrupados
 por año. La significancia se evalúa mediante bootstrap salvaje restringido por año con pesos de Rademacher y 9.999
 réplicas \citep{cameron2008}. Los valores $p$ de Driscoll--Kraay usan 4 rezagos \citep{driscoll1998}. Los coeficientes de
 las variables indicadoras se omiten. $^{***}p<0{,}01$; $^{**}p<0{,}05$; $^{*}p<0{,}1$. Fuente: elaboración propia a partir
