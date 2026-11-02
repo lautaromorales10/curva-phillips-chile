@@ -39,7 +39,7 @@ curva-phillips-chile/
 │   ├── poblacion_hombres_y_mujeres.xlsx     (BDE Banco Central)
 │   └── esi/                                 (microdatos ESI, un .dta por año)
 ├── config.py, econometria.py
-├── 01_procesar_esi.py ... 08_robustez.py
+├── 01_procesar_esi.py ... 09_trimestral.py
 └── ejecutar_todo.py
 ```
 
@@ -65,18 +65,20 @@ la carpeta `resultados/`.
 | `06_comparar_modelos.py` | Inflación frente a composición educacional (R² ajustado, AIC, BIC, R² parcial, F) y correlación entre las series de hombres y mujeres | `comparacion_modelos.json` |
 | `07_tablas_latex.py` | Tablas de la memoria en LaTeX | `tablas/*.tex` |
 | `08_robustez.py` | Robustez: rezagos de la inflación, exclusión de un año a la vez y brecha de desempleo (filtro HP, con la tendencia estimada tras interpolar 2020 y 2021) | `robustez.json`, `tablas/tabla_robustez.tex`, `figuras/fig6_exclusion_anual.png` |
+| `09_trimestral.py` | Robustez con datos trimestrales (2011-2024, 112 observaciones): variaciones interanuales de la desocupación y de la inflación por trimestre calendario; bootstrap salvaje por año y errores de Driscoll-Kraay | `base_trimestral_2010_2024.csv`, `trimestral.json`, `tablas/tabla_trimestral.tex` |
 
 `config.py` define las rutas, el número de réplicas del bootstrap (9.999) y la semilla (2026), que hace
 que los valores p sean siempre los mismos. `econometria.py` contiene las funciones de estimación
-(MCO con errores agrupados, bootstrap salvaje restringido, ADF con valores críticos de MacKinnon (2010) y KPSS).
+(MCO con errores agrupados, bootstrap salvaje restringido, errores de Driscoll-Kraay, ADF con valores críticos
+de MacKinnon (2010) y KPSS).
 
 ## 5. Validación
 
 La carpeta `validacion/` contiene dos programas que se ejecutan después de `ejecutar_todo.py`:
 
 - `python validacion/validar_econometria.py` contrasta cada función de `econometria.py` (MCO, errores
-  agrupados, Wald, Durbin-Watson, bootstrap salvaje, ADF, KPSS y filtro HP) con una implementación
-  independiente, y termina con el número de comprobaciones correctas (11 de 11).
+  agrupados, Wald, Durbin-Watson, bootstrap salvaje, Driscoll-Kraay, ADF, KPSS y filtro HP) con una
+  implementación independiente, y termina con el número de comprobaciones correctas (12 de 12).
 - `python validacion/montecarlo_tamano.py` simula datos en que la inflación no afecta al desempleo, con el
   mismo diseño del modelo de la columna 3, y reporta con qué frecuencia cada prueba rechaza la hipótesis
   nula al 5%. Los errores agrupados convencionales la rechazan en torno al 12% de los casos (cerca del 20%

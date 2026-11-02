@@ -8,7 +8,7 @@ import numpy as np, pandas as pd
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 from config import RES
-from econometria import ols, wald, durbin_watson, wild_t, wild_F, adf, kpss
+from econometria import ols, wald, durbin_watson, wild_t, wild_F, adf, kpss, driscoll_kraay
 
 resultados = []
 def revisar(condicion, texto):
@@ -81,6 +81,18 @@ tau = hp(u, 6.25); K = np.diff(np.eye(Tn), 2, axis=0)
 lineal = np.polyval(np.polyfit(np.arange(Tn), u, 1), np.arange(Tn))
 revisar(np.allclose((u - tau) - 6.25 * K.T @ (K @ tau), 0) and np.allclose(hp(u, 1e-9), u)
         and np.allclose(hp(u, 1e8), lineal, atol=1e-5), "11. Filtro HP: condición de primer orden y casos límite")
+
+# 12. Errores de Driscoll y Kraay: doble suma explícita sobre pares de periodos con pesos de Bartlett
+Lr = 2; per = d.anio.values; T_ = np.unique(per)
+h_ = [sum(X[i] * e[i] for i in range(n) if per[i] == s) for s in T_]
+S_ = np.zeros((k, k))
+for a_ in range(len(T_)):
+    for c_ in range(len(T_)):
+        if abs(a_ - c_) <= Lr:
+            S_ += (1 - abs(a_ - c_) / (Lr + 1)) * np.outer(h_[a_], h_[c_])
+dkr = driscoll_kraay(Y, X, per, Lr)
+revisar(np.allclose(dkr["V"], XtXi @ S_ @ XtXi) and np.allclose(driscoll_kraay(Y, X, np.arange(n), 0)["V"],
+        (n - k) / n * ols(Y, X)["V"]), "12. Driscoll-Kraay: doble suma por periodos y caso sin rezagos igual a White (HC0)")
 
 print(f"\n{sum(resultados)} de {len(resultados)} comprobaciones correctas.")
 sys.exit(0 if all(resultados) else 1)

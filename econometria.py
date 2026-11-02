@@ -1,5 +1,6 @@
 """Herramientas econométricas (NumPy/SciPy): MCO con errores agrupados, bootstrap salvaje
-restringido por grupos (Cameron, Gelbach y Miller, 2008) y pruebas ADF y KPSS."""
+restringido por grupos (Cameron, Gelbach y Miller, 2008), errores de Driscoll y Kraay (1998)
+y pruebas ADF y KPSS."""
 import numpy as np
 from scipy import stats
 
@@ -81,6 +82,22 @@ def wild_F(X, Y, g, R, rng, B):
     G = np.unique(g); idx = np.searchsorted(G, g)
     Fb = [_F_cluster(X, fit + e * rng.choice([-1., 1.], len(G))[idx], g, R) for _ in range(B)]
     return F0, float(np.mean(np.array(Fb) >= F0))
+
+
+# --------------------------------------------------------------------------- Driscoll-Kraay
+def driscoll_kraay(y, X, t, L):
+    """MCO con errores de Driscoll y Kraay (1998): los momentos se suman por periodo t (ordenable
+    cronológicamente) y se aplica una ventana de Bartlett con L rezagos. Robustos a la correlación
+    entre las unidades de un mismo periodo y a la autocorrelación hasta L periodos."""
+    y, X, t = np.asarray(y, float), np.asarray(X, float), np.asarray(t)
+    XtXi = np.linalg.inv(X.T @ X); b = XtXi @ X.T @ y; e = y - X @ b
+    h = np.array([X[t == s].T @ e[t == s] for s in np.unique(t)])
+    S = h.T @ h
+    for l in range(1, L + 1):
+        G = h[l:].T @ h[:-l]
+        S += (1 - l / (L + 1)) * (G + G.T)
+    V = XtXi @ S @ XtXi; se = np.sqrt(np.diag(V)); df = len(h) - 1
+    return dict(b=b, se=se, V=V, df=df, p=2 * stats.t.sf(np.abs(b / se), df))
 
 
 # --------------------------------------------------------------------------- Raíz unitaria
