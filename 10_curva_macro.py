@@ -232,7 +232,7 @@ def num(x, dec=3):
 
 def est(p): return "$^{***}$" if p < .01 else "$^{**}$" if p < .05 else "$^{*}$" if p < .1 else ""
 def ee(x): return f"({x:.3f})".replace(".", ",")
-def pv(p): return f"[{p:.3f}]".replace(".", ",")
+def pv(p): return "[$<$0,001]" if p < 0.0005 else f"[{p:.3f}]".replace(".", ",")
 
 
 COLS = ["tradicional", "expectativas", "expectativas_r", "aceleracionista", "hibrida", "lucas"]

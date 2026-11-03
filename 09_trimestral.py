@@ -101,7 +101,7 @@ def num(x, dec=3):
     s = f"{x:.{dec}f}".replace(".", ",")
     return s.replace("-", "$-$") if s.startswith("-") else s
 def est(p): return "$^{***}$" if p < .01 else "$^{**}$" if p < .05 else "$^{*}$" if p < .1 else ""
-def pv(p): return f"[{p:.3f}]".replace(".", ",")
+def pv(p): return "[$<$0,001]" if p < 0.0005 else f"[{p:.3f}]".replace(".", ",")
 cols = ["T1", "T2", "T3"]
 fila = lambda etq, f: " & ".join([etq] + [f(m) for m in cols]) + r" \\"
 P = {"d_inflacion": lambda m: out[m]["h"]["p_wb"], "d_inflacion_x_sexo": lambda m: out[m]["inter"]["p_wb"],
