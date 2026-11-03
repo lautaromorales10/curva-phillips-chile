@@ -373,7 +373,7 @@ estima con $\lambda = 129{.}600$. En la muestra 1997--2025, la desocupación pro
 y de la ENE desde entonces, se desestacionaliza con efectos trimestrales propios de cada encuesta y la regresión incluye una
 indicadora de nivel desde 2010; antes de 2000, la inflación corresponde al IPC del INE. Las formulaciones que usan la EEE comienzan
 en """ + ini_txt(res["larga"], "hibrida") + " (híbrida) y " + ini_txt(res["larga"], "expectativas_r") + r""" (aumentada por expectativas), por la disponibilidad
-de la encuesta. La formulación adaptativa reemplaza la expectativa por la inflación del trimestre anterior. $^{***}p<0{,}01$;
+de la encuesta. La formulación adaptativa corresponde a la ecuación \eqref{eq:m_hib} sin la expectativa de la EEE, de modo que la inflación del trimestre anterior aproxima las expectativas, y se estima solo en las muestras que comienzan en 1997, en las que la encuesta no cubre todo el periodo. $^{***}p<0{,}01$;
 $^{**}p<0{,}05$; $^{*}p<0{,}1$. Fuente: elaboración propia a partir del Banco Central de Chile e INE.
 \end{minipage}
 \end{table}
