@@ -11,6 +11,8 @@ TEX = RES / "tablas"
 for d in (RES, FIG, TEX):
     d.mkdir(parents=True, exist_ok=True)
 
-ANIOS = range(2010, 2025)
+ANIO_FIN = 2025                      # último año de la muestra
+ANIOS = range(2010, ANIO_FIN + 1)
+BASE = f"base_apilada_2010_{ANIO_FIN}.csv"
 B = 9999                            # réplicas del bootstrap salvaje
 SEMILLA = 2026

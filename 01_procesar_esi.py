@@ -5,7 +5,7 @@ Entrada: datos/esi/*.dta (el año se lee del nombre del archivo).
 Salida:  resultados/esi_por_anio.csv"""
 import re
 import numpy as np, pandas as pd
-from config import ESI, RES
+from config import ESI, RES, ANIOS
 
 VARS = ["sexo", "activ", "nivel", "categoria_ocupacion", "categoria_ocupacional",
         "ing_t_p", "fact_cal_esi", "d4_dias", "d4_horas", "dias", "horas"]
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         print(f"{anio}: ingreso/hora H {h.salario_hora_nominal:6.0f}  M {m.salario_hora_nominal:6.0f} | "
               f"ed. superior H {h.educ_sup:4.1f}%  M {m.educ_sup:4.1f}%  ({ruta.name})", flush=True)
     out = pd.concat(res).sort_values(["anio", "sexo"])
-    faltan = sorted(set(range(2010, 2025)) - set(out.anio))
+    faltan = sorted(set(ANIOS) - set(out.anio))
     if faltan:
         print("ATENCIÓN: faltan años de la ESI:", faltan)
     out.to_csv(RES / "esi_por_anio.csv", index=False)

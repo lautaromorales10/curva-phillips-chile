@@ -7,10 +7,10 @@ import json
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from config import RES, FIG, TEX, B, SEMILLA
+from config import RES, FIG, TEX, B, SEMILLA, BASE, ANIOS, ANIO_FIN
 from econometria import ols, wild_t, durbin_watson
 
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 for a in range(2019, 2024):
     b[f"d{a}"] = (b.anio == a).astype(int)
 g = b.groupby("sexo")
@@ -52,7 +52,7 @@ out["A3_contemp_rezago_2022"] = estimar(b, "d_desempleo", C + L + ["sexo"] + DD 
 pr_c = {"con_H": ["d_inflacion"], "con_M": C}
 base = estimar(b, "d_desempleo", C + ["sexo"] + DD, pr_c)
 jk = {}
-for a in range(2011, 2025):
+for a in range(2011, ANIO_FIN + 1):
     jk[a] = estimar(b[b.anio != a], "d_desempleo", C + ["sexo"] + DD, pr_c)
 out["B_base"] = base
 out["B_exclusion"] = {str(a): v for a, v in jk.items()}
@@ -181,14 +181,14 @@ for clave, col, etq, dx in [("con_H", C_H, "Hombres", -0.17), ("con_M", C_M, "Mu
         sig = jk[a][clave]["p"] < 0.10
         ax.plot(a + dx, jk[a][clave]["b"], marker="o", ms=7, mew=1.6, color=col,
                 mfc=col if sig else "white", mec=col, ls="none", zorder=3)
-    ax.annotate(etq, (2024.6, base[clave]["b"]), xytext=(4, 0), textcoords="offset points",
+    ax.annotate(etq, (ANIO_FIN + 0.6, base[clave]["b"]), xytext=(4, 0), textcoords="offset points",
                 va="center", fontsize=9, color=INK, annotation_clip=False)
 h = [Line2D([], [], marker="o", ms=7, color=C_H, ls="none", label="Hombres"),
      Line2D([], [], marker="o", ms=7, color=C_M, ls="none", label="Mujeres"),
      Line2D([], [], marker="o", ms=7, color=INK2, ls="none", label="Significativa al 10%"),
      Line2D([], [], marker="o", ms=7, mfc="white", mec=INK2, mew=1.6, ls="none", label="No significativa")]
 ax.set_xticks(anios); ax.set_xticklabels([str(a) for a in anios], rotation=45, fontsize=8.5)
-ax.set_xlim(2010.4, 2024.6)
+ax.set_xlim(2010.4, ANIO_FIN + 0.6)
 ax.set_xlabel("Año excluido de la estimación")
 ax.set_ylabel("Pendiente estimada\n(pp. de desempleo por pp. de inflación)")
 ax.legend(handles=h, frameon=False, fontsize=8, ncol=4, loc="lower left", bbox_to_anchor=(0, 1.0))

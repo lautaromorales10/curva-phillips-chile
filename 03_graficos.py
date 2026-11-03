@@ -3,9 +3,9 @@ import pandas as pd, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from config import RES, FIG
+from config import RES, FIG, BASE, ANIOS, ANIO_FIN
 
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv")
+b = pd.read_csv(RES / BASE)
 H, M = b[b.sexo == 0].set_index("anio"), b[b.sexo == 1].set_index("anio")
 
 C_H, C_M, C_1 = "#2a78d6", "#eb6834", "#2a78d6"     # slots 1 y 2 de la paleta validada
@@ -16,7 +16,7 @@ plt.rcParams.update({
     "axes.spines.top": False, "axes.spines.right": False, "axes.grid": True,
     "grid.color": GRID, "grid.linewidth": 0.6, "axes.axisbelow": True,
     "figure.dpi": 100, "savefig.dpi": 300, "savefig.bbox": "tight"})
-anios = list(range(2010, 2025))
+anios = list(ANIOS)
 
 def marco(ax, ylabel, shocks=True):
     if shocks:
@@ -26,7 +26,7 @@ def marco(ax, ylabel, shocks=True):
         ax.axvline(2019, color=INK2, lw=0.8, ls=(0, (2, 2)), zorder=1)
         ax.text(2019, 0.98, "Estallido ", transform=ax.get_xaxis_transform(),
                 ha="right", va="top", fontsize=8, color=INK2)
-    ax.set_xticks(anios[::2]); ax.set_xlim(2009.6, 2024.6); ax.set_ylabel(ylabel)
+    ax.set_xticks(anios[::2]); ax.set_xlim(2009.6, ANIO_FIN + 0.6); ax.set_ylabel(ylabel)
 
 def dos_series(col, ylabel, archivo, loc):
     fig, ax = plt.subplots(figsize=(6.3, 3.4))
@@ -34,7 +34,7 @@ def dos_series(col, ylabel, archivo, loc):
     for d, c, n in [(H, C_H, "Hombres"), (M, C_M, "Mujeres")]:
         ax.plot(d.index, d[col], color=c, lw=2, marker="o", ms=4,
                 markeredgecolor="white", markeredgewidth=1, label=n)
-        ax.annotate(n, (2024, d[col].iloc[-1]), xytext=(6, 0), textcoords="offset points",
+        ax.annotate(n, (ANIO_FIN, d[col].iloc[-1]), xytext=(6, 0), textcoords="offset points",
                     va="center", fontsize=9, color=INK)
     ax.legend(frameon=False, fontsize=8.5, **loc)
     fig.savefig(FIG / archivo); plt.close(fig)

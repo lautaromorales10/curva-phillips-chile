@@ -1,6 +1,6 @@
 """Herramientas econométricas (NumPy/SciPy): MCO con errores agrupados, bootstrap salvaje
-restringido por grupos (Cameron, Gelbach y Miller, 2008), errores de Driscoll y Kraay (1998)
-y pruebas ADF y KPSS."""
+restringido por grupos (Cameron, Gelbach y Miller, 2008), errores de Driscoll y Kraay (1998) y de
+Newey y West (1987), filtro de Hodrick y Prescott (1997) y pruebas ADF y KPSS."""
 import numpy as np
 from scipy import stats
 
@@ -98,6 +98,31 @@ def driscoll_kraay(y, X, t, L):
     S = h.T @ np.where(dist <= L, 1 - dist / (L + 1), 0.0) @ h
     V = XtXi @ S @ XtXi; se = np.sqrt(np.diag(V)); df = len(h) - 1
     return dict(b=b, se=se, V=V, df=df, p=2 * stats.t.sf(np.abs(b / se), df))
+
+
+# --------------------------------------------------------------------------- Newey-West
+def newey_west(y, X, L):
+    """MCO con errores de Newey y West (1987): robustos a heterocedasticidad y a autocorrelación hasta
+    L periodos (ventana de Bartlett), con corrección n/(n-k). Las observaciones deben ser periodos
+    consecutivos. Los valores p usan la distribución t con n-k grados de libertad."""
+    y, X = np.asarray(y, float), np.asarray(X, float); n, k = X.shape
+    XtXi = np.linalg.inv(X.T @ X); b = XtXi @ X.T @ y; e = y - X @ b
+    h = X * e[:, None]; S = h.T @ h
+    for l in range(1, L + 1):
+        G = h[l:].T @ h[:-l]; S += (1 - l / (L + 1)) * (G + G.T)
+    V = n / (n - k) * XtXi @ S @ XtXi; se = np.sqrt(np.diag(V)); df = n - k
+    r2 = 1 - (e @ e) / ((y - y.mean()) @ (y - y.mean()))
+    return dict(b=b, se=se, V=V, df=df, n=n, k=k, p=2 * stats.t.sf(np.abs(b / se), df), r2=r2,
+                r2a=1 - (1 - r2) * (n - 1) / (n - k), resid=e)
+
+
+def filtro_hp(y, lam):
+    """Tendencia del filtro de Hodrick y Prescott (1997)."""
+    y = np.asarray(y, float); n = len(y)
+    D = np.zeros((n - 2, n))
+    for i in range(n - 2):
+        D[i, i:i + 3] = [1, -2, 1]
+    return np.linalg.solve(np.eye(n) + lam * D.T @ D, y)
 
 
 # --------------------------------------------------------------------------- Raíz unitaria

@@ -1,5 +1,5 @@
 """Simulación de Monte Carlo del tamaño de las pruebas con el diseño del estudio (modelo de la columna 3
-de la Tabla 7: 14 años x 2 sexos, con las mismas variables e indicadoras). Se generan datos en que la
+de la tabla de determinantes del desempleo de la Parte II: 15 años x 2 sexos, con las mismas variables e indicadoras). Se generan datos en que la
 inflación no afecta al desempleo y se cuenta cuántas veces cada prueba rechaza la hipótesis nula al 5%.
 Requiere haber ejecutado antes ejecutar_todo.py.   Uso:  python validacion/montecarlo_tamano.py"""
 import sys
@@ -8,11 +8,11 @@ import numpy as np, pandas as pd
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
-from config import RES, SEMILLA
+from config import RES, SEMILLA, BASE
 from econometria import ols, wild_t
 
 REPLICAS, B = 2000, 399
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 for a in (2020, 2021):
     b[f"d{a}"] = (b.anio == a).astype(int)
 xs = ["d_inflacion", "d_inflacion_x_sexo", "sexo", "d2019", "d2020", "d2021"]

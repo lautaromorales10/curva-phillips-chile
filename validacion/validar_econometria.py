@@ -7,18 +7,18 @@ import numpy as np, pandas as pd
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
-from config import RES
-from econometria import ols, wald, durbin_watson, wild_t, wild_F, adf, kpss, driscoll_kraay
+from config import RES, BASE
+from econometria import ols, wald, durbin_watson, wild_t, wild_F, adf, kpss, driscoll_kraay, newey_west, filtro_hp
 
 resultados = []
 def revisar(condicion, texto):
     resultados.append(bool(condicion))
     print(("OK    " if condicion else "FALLA ") + texto)
 
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 for a in (2020, 2021):
     b[f"d{a}"] = (b.anio == a).astype(int)
-xs = ["d_inflacion", "d_inflacion_x_sexo", "sexo", "d2019", "d2020", "d2021"]   # columna 3 de la Tabla 7
+xs = ["d_inflacion", "d_inflacion_x_sexo", "sexo", "d2019", "d2020", "d2021"]   # columna 3 de la tabla de determinantes del desempleo
 d = b.dropna(subset=["d_desempleo"] + xs)
 X = np.column_stack([np.ones(len(d))] + [d[v].values for v in xs]); Y = d.d_desempleo.values; g = d.anio.values
 n, k = X.shape; G = np.unique(g); idx = np.searchsorted(G, g)
@@ -93,6 +93,28 @@ for a_ in range(len(T_)):
 dkr = driscoll_kraay(Y, X, per, Lr)
 revisar(np.allclose(dkr["V"], XtXi @ S_ @ XtXi) and np.allclose(driscoll_kraay(Y, X, np.arange(n), 0)["V"],
         (n - k) / n * ols(Y, X)["V"]), "12. Driscoll-Kraay: doble suma por periodos y caso sin rezagos igual a White (HC0)")
+
+# 13. Errores de Newey y West (Parte I): doble suma explícita sobre pares de periodos con pesos de Bartlett,
+#     con los datos trimestrales de la formulación híbrida
+q = pd.read_csv(RES / "base_macro_trimestral.csv")
+q["pi_l1"] = q.pi.shift(1)
+qq = q.dropna(subset=["pi", "pie_l1", "pi_l1", "brecha", "dep", "pet"])
+Xq = np.column_stack([np.ones(len(qq))] + [qq[v].values for v in ["pie_l1", "pi_l1", "brecha", "dep", "pet", "d_estallido", "d_pandemia"]])
+Yq = qq.pi.values; nq, kq = Xq.shape; Lq = 4
+bq = np.linalg.lstsq(Xq, Yq, rcond=None)[0]; eq = Yq - Xq @ bq; Ai = np.linalg.inv(Xq.T @ Xq)
+Sq = np.zeros((kq, kq))
+for s_ in range(nq):
+    for t_ in range(nq):
+        if abs(s_ - t_) <= Lq:
+            Sq += (1 - abs(s_ - t_) / (Lq + 1)) * eq[s_] * eq[t_] * np.outer(Xq[s_], Xq[t_])
+nwr = newey_west(Yq, Xq, Lq)
+revisar(np.allclose(nwr["b"], bq) and np.allclose(nwr["V"], nq / (nq - kq) * Ai @ Sq @ Ai)
+        and np.allclose(newey_west(Yq, Xq, 0)["V"], ols(Yq, Xq)["V"]),
+        "13. Newey-West: doble suma por periodos y caso sin rezagos igual a White (HC1)")
+
+# 14. Filtro HP de econometria.py (Parte I) igual al de 08_robustez.py
+revisar(np.allclose(filtro_hp(u, 6.25), hp(u, 6.25)) and np.allclose(filtro_hp(Yq, 1600), hp(Yq, 1600)),
+        "14. Filtro HP de econometria.py igual al de la Parte II")
 
 print(f"\n{sum(resultados)} de {len(resultados)} comprobaciones correctas.")
 sys.exit(0 if all(resultados) else 1)

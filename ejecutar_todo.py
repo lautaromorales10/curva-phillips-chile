@@ -5,7 +5,7 @@ from pathlib import Path
 
 PASOS = ["01_procesar_esi.py", "02_armar_base.py", "03_graficos.py", "04_estacionariedad.py",
          "05_estimar_modelos.py", "06_comparar_modelos.py", "07_tablas_latex.py", "08_robustez.py",
-         "09_trimestral.py"]
+         "09_trimestral.py", "10_curva_macro.py"]
 if "--sin-esi" in sys.argv:
     PASOS = PASOS[1:]
 aqui = Path(__file__).resolve().parent

@@ -1,6 +1,6 @@
 """Paso 7. Tablas en LaTeX (decimales con coma) para el informe. Salida: resultados/tablas/*.tex"""
 import json, pandas as pd
-from config import RES, TEX
+from config import RES, TEX, BASE, ANIO_FIN
 
 R = json.load(open(RES / "resultados_modelos.json"))
 
@@ -48,7 +48,7 @@ tex = r"""\begin{table}[htbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\caption{Estimación de la Curva de Phillips y de los determinantes del desempleo, Chile 2010--2024}
+\caption{Determinantes de la tasa de desocupación por sexo, Chile 2010--2025}
 \label{tab:resultados}
 \begin{tabular}{lcccccc}
 \toprule
@@ -132,7 +132,7 @@ for _, r in e.iterrows():
 tex2 = r"""\begin{table}[htbp]
 \centering
 \footnotesize
-\caption{Pruebas de raíz unitaria (ADF) y de estacionariedad (KPSS), 2010--2024}
+\caption{Pruebas de raíz unitaria (ADF) y de estacionariedad (KPSS), 2010--2025}
 \label{tab:estacionariedad}
 \begin{tabular}{lllcrrrr}
 \toprule
@@ -147,7 +147,7 @@ Serie & Sexo & Forma & Det. & ADF & Crít. 5\% & KPSS & Crít. 5\% \\
 \scriptsize \textit{Nota.} ADF: prueba de Dickey--Fuller aumentada sin rezagos, cuya hipótesis nula es la presencia
 de raíz unitaria; valores críticos para muestra finita según \citet{mackinnon2010}. KPSS: hipótesis nula de
 estacionariedad \citep{kpss1992}. Det.: componentes determinísticos (C = constante; T = tendencia lineal).
-$^{**}$ indica rechazo de la hipótesis nula al 5\%. Con quince observaciones, ambas pruebas tienen baja potencia.
+$^{**}$ indica rechazo de la hipótesis nula al 5\%. Con dieciséis observaciones, ambas pruebas tienen baja potencia.
 \end{minipage}
 \end{table}
 """
@@ -206,7 +206,7 @@ print("Tablas guardadas en", TEX)
 
 # ------------------------------------------------------------------ Estadísticas descriptivas
 import numpy as np
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 VARS_D = [("Tasa de desocupación (\\%)", "desempleo", 2), ("Inflación (\\%)", "inflacion", 2),
           ("Fuerza de trabajo con educación superior (\\%)", "educ_sup", 2),
           ("Ingreso real por hora (pesos de 2023)", "salario_real_hora", 0),
@@ -236,7 +236,7 @@ tex4 = r"""\begin{table}[htbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\caption{Estadísticas descriptivas de las variables por sexo, 2010--2024}
+\caption{Estadísticas descriptivas de las variables por sexo, 2010--2025}
 \label{tab:descriptivas}
 \begin{tabular}{>{\raggedright\arraybackslash}p{4.6cm}rrrrrrrr}
 \toprule
@@ -251,8 +251,8 @@ Variable & Media & D.E. & Mín. & Máx. & Media & D.E. & Mín. & Máx. \\
 
 \vspace{4pt}
 \begin{minipage}{0.97\linewidth}
-\scriptsize \textit{Nota.} D.E.: desviación estándar; pp.: puntos porcentuales. Niveles: 15 observaciones por sexo; primeras
-diferencias: 14. La inflación es común a ambos sexos. La variación del ingreso real corresponde a la diferencia de su logaritmo
+\scriptsize \textit{Nota.} D.E.: desviación estándar; pp.: puntos porcentuales. Niveles: 16 observaciones por sexo; primeras
+diferencias: 15. La inflación es común a ambos sexos. La variación del ingreso real corresponde a la diferencia de su logaritmo
 multiplicada por 100. Fuente: elaboración propia a partir de INE y Banco Central de Chile.
 \end{minipage}
 \end{table}
@@ -305,7 +305,7 @@ for _, r in b.sort_values(["anio", "sexo"]).iterrows():
 tex6 = r"""{\footnotesize
 \setlength{\tabcolsep}{6pt}
 \begin{longtable}{llrrrrrr}
-\caption{Base de datos apilada por sexo, 2010--2024}\label{tab:anexo_base}\\
+\caption{Base de datos apilada por sexo, 2010--2025}\label{tab:anexo_base}\\
 \toprule
 Año & Sexo & $U$ (\%) & $\pi$ (\%) & $E$ (\%) & $w$ (\$ de 2023) & $\Delta U$ (pp.) & $\Delta \ln w$ (\%) \\
 \midrule

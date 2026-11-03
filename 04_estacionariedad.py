@@ -1,10 +1,10 @@
 """Paso 4. Pruebas ADF y KPSS por serie y sexo, en niveles y en primeras diferencias.
 Salida: resultados/estacionariedad.csv"""
 import numpy as np, pandas as pd
-from config import RES
+from config import RES, BASE
 from econometria import adf, kpss
 
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 b["salario_real_hora"] = np.log(b.salario_real_hora)
 # Componentes determinísticos en niveles: constante (c) o constante y tendencia (ct) para series con tendencia
 SERIES = {"desempleo": "c", "inflacion": "c", "educ_sup": "ct", "salario_real_hora": "ct"}

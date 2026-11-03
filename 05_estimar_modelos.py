@@ -1,13 +1,13 @@
 """Paso 5. Estimación de la Curva de Phillips y de los determinantes del desempleo.
 MCO sobre la base apilada, errores agrupados por año e inferencia por bootstrap salvaje restringido
-por año (pesos de Rademacher, 9.999 réplicas), adecuado con solo 15 grupos (Cameron et al., 2008).
+por año (pesos de Rademacher, 9.999 réplicas), adecuado con solo 16 grupos (Cameron et al., 2008).
 Salida: resultados/resultados_modelos.json"""
 import json
 import numpy as np, pandas as pd
-from config import RES, B, SEMILLA
+from config import RES, B, SEMILLA, BASE, ANIOS, ANIO_FIN
 from econometria import ols, wald, wild_t, durbin_watson
 
-b = pd.read_csv(RES / "base_apilada_2010_2024.csv").sort_values(["sexo", "anio"])
+b = pd.read_csv(RES / BASE).sort_values(["sexo", "anio"])
 for a in (2020, 2021, 2022):
     b[f"d{a}"] = (b.anio == a).astype(int)
 b["desempleo_x_sexo"] = b.desempleo * b.sexo

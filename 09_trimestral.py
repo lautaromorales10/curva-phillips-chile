@@ -7,16 +7,16 @@ ESI, que es anual, por lo que no forman parte de esta estimación.
   - Inflación: variación porcentual del IPC promedio del trimestre respecto del mismo trimestre del año
     anterior (análoga a la definición anual).
   - Variaciones interanuales (respecto del mismo trimestre del año anterior), que eliminan la estacionalidad
-    de las series no desestacionalizadas: 2011T1-2024T4, 56 trimestres por sexo.
+    de las series no desestacionalizadas: 2011T1-2025T4, 60 trimestres por sexo.
 Inferencia: errores agrupados por año y bootstrap salvaje restringido por año, como en la estimación anual;
 como verificación, errores de Driscoll y Kraay (1998) con 4 rezagos, que consideran la autocorrelación que
 genera el traslape de las variaciones interanuales.
-Salidas: resultados/base_trimestral_2010_2024.csv, resultados/trimestral.json,
+Salidas: resultados/base_trimestral_2010_2025.csv, resultados/trimestral.json,
          resultados/tablas/tabla_trimestral.tex"""
 import json
 import numpy as np, pandas as pd
 from scipy import stats
-from config import DATOS, RES, TEX, B, SEMILLA
+from config import DATOS, RES, TEX, B, SEMILLA, ANIO_FIN
 from econometria import ols, wild_t, driscoll_kraay, durbin_watson
 
 REZAGOS_DK = 4
@@ -44,12 +44,12 @@ for archivo, sexo in (("desocupacion_hombres.xlsx", 0), ("desocupacion_mujeres.x
     d["sexo"] = sexo
     partes.append(d)
 b = pd.concat(partes)
-b = b[(b.index >= pd.Period("2010Q1")) & (b.index <= pd.Period("2024Q4"))].copy()
+b = b[(b.index >= pd.Period("2010Q1")) & (b.index <= pd.Period(f"{ANIO_FIN}Q4"))].copy()
 b["anio"], b["trimestre"] = b.index.year, b.index.quarter
 b["periodo"] = b.anio * 4 + b.trimestre                        # índice trimestral consecutivo (Driscoll-Kraay)
-assert len(b) == 120, "La base trimestral debe tener 60 trimestres por sexo"
+assert len(b) == 8 * (ANIO_FIN - 2009), "La base trimestral debe tener cuatro trimestres por año y sexo"
 b.reset_index(drop=True)[["anio", "trimestre", "sexo", "desempleo", "inflacion", "d_desempleo", "d_inflacion"]] \
-    .round(4).to_csv(RES / "base_trimestral_2010_2024.csv", index=False)
+    .round(4).to_csv(RES / f"base_trimestral_2010_{ANIO_FIN}.csv", index=False)
 
 d = b.dropna(subset=["d_desempleo", "d_inflacion"]).copy()
 d["d_inflacion_x_sexo"] = d.d_inflacion * d.sexo
@@ -130,7 +130,7 @@ tex = r"""\begin{table}[htbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{5pt}
-\caption{Curva de Phillips con datos trimestrales, Chile 2011--2024}
+\caption{Desocupación por sexo e inflación con datos trimestrales, Chile 2011--2025}
 \label{tab:trimestral}
 \begin{tabular}{lccc}
 \toprule
