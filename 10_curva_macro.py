@@ -208,6 +208,12 @@ res["larga"], res["larga_pre2010"] = {}, {}
 for nombre, (y, xs, ini) in FORM_L.items():
     res["larga"][nombre] = resumen(estimar(lq, y, xs + ["brecha"] + CTR + DUM + ["d2010"], L_T, ini, FIN), "brecha")
     res["larga_pre2010"][nombre] = resumen(estimar(lq, y, xs + ["brecha"] + CTR, L_T, ini, "2009Q4"), "brecha")
+# Submuestras desde 2000: excluyen la etapa de metas anuales decrecientes, que concluyó en 1999 (Morandé, 2001)
+res["larga_2000"], res["larga_2000_pre2010"] = {}, {}
+for nombre, (y, xs, ini) in FORM_L.items():
+    ini2 = max(ini, "2000Q1")
+    res["larga_2000"][nombre] = resumen(estimar(lq, y, xs + ["brecha"] + CTR + DUM + ["d2010"], L_T, ini2, FIN), "brecha")
+    res["larga_2000_pre2010"][nombre] = resumen(estimar(lq, y, xs + ["brecha"] + CTR, L_T, ini2, "2009Q4"), "brecha")
 res["larga"]["hibrida_post"] = con_post(lq, "pi_l", ["pie_l1", "pi_l_l1"], "brecha", POST, L_T, "2002Q1", FIN,
                                         extra=CTR + DUM + ["d2010"])
 
